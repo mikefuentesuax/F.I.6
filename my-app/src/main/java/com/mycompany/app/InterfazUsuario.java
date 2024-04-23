@@ -1,47 +1,41 @@
-package com.mycompany.app;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import java.util.TreeSet;
 
 public class InterfazUsuario extends JFrame {
 
     private DatosMultidimensionales<String> datosStrings;
+    private TreeSet<String> nombresOrdenados;
     private DefaultListModel<String> modeloLista;
     private JList<String> listaDatos;
     private JTextField campoDato;
     private JButton btnAgregar;
     private JButton btnModificar;
     private JButton btnEliminar;
-    private JTextField campoFiltro;
+    private JComboBox<String> comboOrdenar;
 
     public InterfazUsuario() {
         datosStrings = new DatosMultidimensionales<>();
+        nombresOrdenados = new TreeSet<>();
         modeloLista = new DefaultListModel<>();
 
         listaDatos = new JList<>(modeloLista);
         JScrollPane scrollLista = new JScrollPane(listaDatos);
 
         campoDato = new JTextField(20);
-        campoFiltro = new JTextField(20);
 
         btnAgregar = new JButton("Agregar");
         btnModificar = new JButton("Modificar");
         btnEliminar = new JButton("Eliminar");
 
+        comboOrdenar = new JComboBox<>(new String[]{"Sin orden", "Ordenar nombres", "Ordenar ventas"});
+        comboOrdenar.addActionListener(e -> ordenarDatos());
+
         btnAgregar.addActionListener(e -> agregarDato());
         btnModificar.addActionListener(e -> modificarDato());
         btnEliminar.addActionListener(e -> eliminarDato());
-
-        campoFiltro.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-                filtrarDatos();
-            }
-        });
 
         JPanel panelEntrada = new JPanel();
         panelEntrada.add(new JLabel("Dato:"));
@@ -49,8 +43,8 @@ public class InterfazUsuario extends JFrame {
         panelEntrada.add(btnAgregar);
         panelEntrada.add(btnModificar);
         panelEntrada.add(btnEliminar);
-        panelEntrada.add(new JLabel("Filtro:"));
-        panelEntrada.add(campoFiltro);
+        panelEntrada.add(new JLabel("Ordenar por:"));
+        panelEntrada.add(comboOrdenar);
 
         setLayout(new BorderLayout());
         add(scrollLista, BorderLayout.CENTER);
@@ -67,7 +61,8 @@ public class InterfazUsuario extends JFrame {
         String dato = campoDato.getText();
         if (!dato.isEmpty()) {
             datosStrings.agregarDato(dato);
-            modeloLista.addElement(dato);
+            nombresOrdenados.add(dato);
+            actualizarLista();
             campoDato.setText("");
         }
     }
@@ -79,8 +74,10 @@ public class InterfazUsuario extends JFrame {
             String nuevoDato = campoDato.getText();
             if (!nuevoDato.isEmpty()) {
                 datosStrings.eliminarDato(datoAnterior);
+                nombresOrdenados.remove(datoAnterior);
                 datosStrings.agregarDato(nuevoDato);
-                modeloLista.setElementAt(nuevoDato, indice);
+                nombresOrdenados.add(nuevoDato);
+                actualizarLista();
                 campoDato.setText("");
             }
         }
@@ -91,18 +88,41 @@ public class InterfazUsuario extends JFrame {
         if (indice != -1) {
             String dato = modeloLista.getElementAt(indice);
             datosStrings.eliminarDato(dato);
-            modeloLista.removeElementAt(indice);
+            nombresOrdenados.remove(dato);
+            actualizarLista();
         }
     }
 
-    private void filtrarDatos() {
-        String filtro = campoFiltro.getText().toLowerCase();
+    private void ordenarDatos() {
+        String criterio = (String) comboOrdenar.getSelectedItem();
         DefaultListModel<String> nuevaLista = new DefaultListModel<>();
-        for (int i = 0; i < modeloLista.getSize(); i++) {
-            String dato = modeloLista.getElementAt(i);
-            if (dato.toLowerCase().contains(filtro)) {
-                nuevaLista.addElement(dato);
-            }
+        switch (criterio) {
+            case "Ordenar nombres":
+                for (String nombre : nombresOrdenados) {
+                    nuevaLista.addElement(nombre);
+                }
+                break;
+            case "Ordenar ventas":
+                // Aquí puedes implementar la lógica para ordenar ventas
+                // por diferentes criterios, por ejemplo, alfabéticamente o numéricamente.
+                // Por ahora, simplemente mostraremos los datos sin ordenar.
+                for (String dato : datosStrings.getDatos()) {
+                    nuevaLista.addElement(dato);
+                }
+                break;
+            default:
+                for (String dato : datosStrings.getDatos()) {
+                    nuevaLista.addElement(dato);
+                }
+                break;
+        }
+        listaDatos.setModel(nuevaLista);
+    }
+
+    private void actualizarLista() {
+        DefaultListModel<String> nuevaLista = new DefaultListModel<>();
+        for (String nombre : nombresOrdenados) {
+            nuevaLista.addElement(nombre);
         }
         listaDatos.setModel(nuevaLista);
     }

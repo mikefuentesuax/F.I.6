@@ -32,7 +32,7 @@ public class InterfazUsuario extends JFrame {
         btnModificar = new JButton("Modificar");
         btnEliminar = new JButton("Eliminar");
 
-        comboOrdenar = new JComboBox<>(new String[]{"Sin orden", "Ordenar nombres", "Ordenar ventas"});
+        comboOrdenar = new JComboBox<>(new String[]{"Sin orden", "Ordenar nombres", "Ordenar ventas alfabéticamente", "Ordenar ventas numéricamente"});
         comboOrdenar.addActionListener(e -> ordenarDatos());
 
         btnAgregar.addActionListener(e -> agregarDato());
@@ -95,6 +95,32 @@ public class InterfazUsuario extends JFrame {
         }
     }
 
+    private void ordenarAlfabeticamente(DefaultListModel<String> modelo) {
+        TreeSet<String> set = new TreeSet<>();
+        for (int i = 0; i < modelo.getSize(); i++) {
+            set.add(modelo.getElementAt(i));
+        }
+        modelo.clear();
+        for (String elemento : set) {
+            modelo.addElement(elemento);
+        }
+    }
+
+    private void ordenarNumericamente(DefaultListModel<String> modelo) {
+        TreeSet<String> set = new TreeSet<>((s1, s2) -> {
+            int num1 = Integer.parseInt(s1);
+            int num2 = Integer.parseInt(s2);
+            return Integer.compare(num1, num2);
+        });
+        for (int i = 0; i < modelo.getSize(); i++) {
+            set.add(modelo.getElementAt(i));
+        }
+        modelo.clear();
+        for (String elemento : set) {
+            modelo.addElement(elemento);
+        }
+    }
+
     private void ordenarDatos() {
         String criterio = (String) comboOrdenar.getSelectedItem();
         DefaultListModel<String> nuevaLista = new DefaultListModel<>();
@@ -104,13 +130,11 @@ public class InterfazUsuario extends JFrame {
                     nuevaLista.addElement(nombre);
                 }
                 break;
-            case "Ordenar ventas":
-                // Aquí puedes implementar la lógica para ordenar ventas
-                // por diferentes criterios, por ejemplo, alfabéticamente o numéricamente.
-                // Por ahora, simplemente mostraremos los datos sin ordenar.
-                for (String dato : datosStrings.getDatos()) {
-                    nuevaLista.addElement(dato);
-                }
+            case "Ordenar ventas alfabéticamente":
+                ordenarAlfabeticamente(nuevaLista);
+                break;
+            case "Ordenar ventas numéricamente":
+                ordenarNumericamente(nuevaLista);
                 break;
             default:
                 for (String dato : datosStrings.getDatos()) {

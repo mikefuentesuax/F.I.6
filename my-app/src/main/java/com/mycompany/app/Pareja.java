@@ -1,4 +1,4 @@
-
+package com.mycompany.app;
 
 public class Pareja<T, U> {
     private T primero;

@@ -1,6 +1,6 @@
-import java.util.*;
 
-class Pareja<T, U> {
+
+public class Pareja<T, U> {
     private T primero;
     private U segundo;
 

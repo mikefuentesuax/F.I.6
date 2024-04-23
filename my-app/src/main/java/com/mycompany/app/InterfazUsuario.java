@@ -37,3 +37,20 @@ public class InterfazUsuario extends JFrame {
                 }
             }
         });
+
+        JPanel panelEntrada = new JPanel();
+        panelEntrada.add(new JLabel("Dato:"));
+        panelEntrada.add(campoDato);
+        panelEntrada.add(btnAgregar);
+        panelEntrada.add(btnEliminar);
+
+        setLayout(new BorderLayout());
+        add(scrollLista, BorderLayout.CENTER);
+        add(panelEntrada, BorderLayout.SOUTH);
+
+        setTitle("Interfaz de Usuario");
+        setSize(400, 300);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
